@@ -6,6 +6,10 @@ TagManager:
   tags:
   - Ground
   - Opp
+  - Game Manager
+  - Rail
+  - Rail Exit
+  - R Surface
   layers:
   - Default
   - TransparentFX

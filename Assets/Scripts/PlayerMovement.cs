@@ -1,5 +1,7 @@
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.UI;
+using UnityEngine.Splines;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -17,7 +19,19 @@ public class PlayerMovement : MonoBehaviour
     int clipSize = 8;
     float reloadTime = 2.0f;
     bool reload;
+    public SplineAnimate spline;
+    [SerializeField] Transform rObject;
+    bool reflect;
+    Vector3 pos;
 
+    void Awake()
+    {
+        spline = this.GetComponent<SplineAnimate>();
+
+        transform.position = Vector3.up;
+        transform.localEulerAngles = Vector3.zero;
+        pos = rObject.position;
+    }
 
     void Start()
     {
@@ -30,6 +44,14 @@ public class PlayerMovement : MonoBehaviour
         InputHandler();
         Casting();
         Shoot();
+        if(reflect) 
+        {
+            pos = Vector3.Reflect(transform.position, -transform.position.normalized);
+            pos.y = 2;
+            rObject.position = pos;
+        }
+
+        Debug.Log(rObject.position);
     }
 
     void FixedUpdate()
@@ -47,6 +69,8 @@ public class PlayerMovement : MonoBehaviour
     {
         orientation.localEulerAngles = new Vector3(orientation.localEulerAngles.x, cam.transform.localEulerAngles.y, orientation.localEulerAngles.z);
         Vector3 inputDir = orientation.forward * vInput + orientation.right * hInput;
+        inputDir.y = playerRb.linearVelocity.y;
+
         //print(orientation);
         player.transform.localEulerAngles = orientation.localEulerAngles;
 
@@ -61,6 +85,7 @@ public class PlayerMovement : MonoBehaviour
     {
         Ray laser = Camera.main.ViewportPointToRay(centerScreen);
         RaycastHit hit = new RaycastHit();
+
 
         if (Physics.Raycast(laser, out hit))
         {
@@ -92,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
             reload = true;
         }
 
-        if(reload)
+        if (reload)
         {
             if (reloadTime >= 0f)
             {
@@ -104,6 +129,21 @@ public class PlayerMovement : MonoBehaviour
                 reloadTime = 2.0f;
                 reload = false;
             }
+        }
+    }
+
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.tag == "Rail") spline.Play();
+
+        if (col.gameObject.tag == "Rail Exit") 
+        {
+            spline.Pause();
+        }
+
+        if(col.gameObject.tag == "R Surface")
+        {
+            reflect = true;
         }
     }
 }

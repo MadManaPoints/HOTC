@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Hop Out the Coop.sln"
+    "dotnet.defaultSolution": "HOTC.sln"
 }
